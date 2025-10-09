@@ -1,0 +1,73 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ai replay</title>
+    <Style>
+        /* popup body */
+        
+        body {
+            width: 220px;
+            padding: 20px;
+            background-color: #DCF8C6;
+            font-family: 'Segoe UI', sans-serif;
+            color: #075E54;
+        }
+        /* "Stert" बटन - प्राथमिकता बटन */
+        
+        button#stert {
+            margin: 20px;
+            background-color: #25D366;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        button#stert:hover {
+            background-color: #128C7E;
+        }
+        /* "Trening" बटन - सेकेंडरी इंटरफ़ेस */
+        
+        button#stop {
+            background-color: red;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        button#stop:hover {
+            background-color: #075E54;
+        }
+        /* शीर्षक */
+        
+        h2 {
+            color: #075E54;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+        /* बटन टेक्स्ट — अगर आपने <h3> रखा है */
+    </Style>
+</head>
+
+<body>
+    <div id="container">
+        <button id="stert">Stert</button>
+        <button id="stop">Stop</button>
+        <pre id="result"> clikck stert</pre>
+    </div>
+    <script src="popup.js"></script>
+
+</body>
+
+</html>
