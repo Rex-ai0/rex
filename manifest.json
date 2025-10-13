@@ -3,16 +3,6 @@
     "name": "whats_arp",
     "version": "1.0",
     "description": "A simple Chrome extension example.",
-    "action": {
-        "default_popup": "popup.html",
-        "default_icon": "icon.png"
-    },
-    "content_scripts": [{
-            "matches": ["https://web.whatsapp.com/*"],
-            "js": ["content.js"]
-        }
-
-    ],
     "permissions": [
         "tabs",
         "clipboardRead",
@@ -21,12 +11,23 @@
         "storage",
         "scripting",
         "declarativeContent",
-        "scripting",
         "activeTab"
     ],
-    "host_permissions": ["https://web.whatsapp.com/*"],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "icon.jpg"
+    },
+    "content_scripts": [{
+            "matches": ["https://web.whatsapp.com/*"],
+            "js": ["content.js"]
+        }
+
+    ],
     "background": {
         "service_worker": "background.js"
     },
-    "options_page": "options.html"
+    "options_page": "options.html",
+    "host_permissions": ["https://web.whatsapp.com/*"]
+
+
 }

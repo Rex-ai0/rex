@@ -14,23 +14,6 @@ function extractChatMessages() {
     // alert("✅ Chat messages extracted! Check console (F12) for output.");
 
     return finalText;
-
-
-    // Input box select karo
-    // let inputBox = document.querySelector("div[contenteditable='true'][data-tab='10']");
-
-    // if (inputBox) {
-    //     // WhatsApp ka input box ek contenteditable hai → innerHTML se set karna
-    //     inputBox.innerHTML = finalText.replace(/\n/g, "<br>");
-
-    //     // Trigger input event (WhatsApp ko lage user ne type kiya hai)
-    //     inputBox.dispatchEvent(new InputEvent("input", { bubbles: true }));
-
-    //     alert("✅ Chat copied into WhatsApp input box!");
-    // } else {
-    //     console.error("❌ Input box nahi mila!");
-    // }
-    // return finalText;
 }
 
 console.log("Content script: loaded"); // for checking
@@ -38,10 +21,42 @@ console.log("Content script: loaded"); // for checking
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("Content script: got message", request);
     if (request.type === 'GET_REPLY') {
-        const response = extractChatMessages(); // your custom function
-        sendResponse({
-            text: response
-        });
+        try {
+            const response = extractChatMessages(); // your custom function
+            sendResponse({
+                text: response
+            });
+
+        } catch (err) {
+            sendResponse({ text: 'Error: ' + err.message });
+
+        }
         return true; // only needed if async
     }
 });
+
+// function sendMessage(msg) {
+//     // Step 1: Find message box
+//     const boxes = document.querySelectorAll('div[contenteditable="true"]');
+//     if (boxes.length === 0) return console.error("❌ Input box not found!");
+//     const inputBox = boxes[boxes.length - 1];
+//     inputBox.focus();
+
+//     // Step 2: Type message
+//     document.execCommand('insertText', false, msg);
+
+//     // Step 3: Find send button and click
+//     setTimeout(() => {
+//         const sendButton =
+//             document.querySelector('span[data-icon="wds-ic-send-filled"]') ||
+//             document.querySelector('button span[data-icon="wds-ic-send-filled"]');
+
+//         if (sendButton) {
+//             sendButton.closest('button');
+//             sendButton.click();
+//             console.log("✅ Message sent:", msg);
+//         } else {
+//             console.error("❌ Send button not found! (selector outdated)");
+//         }
+//     }, 500);
+// }

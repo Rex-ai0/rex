@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "chrome": "^0.1.0",
-    "jsautogui": "^2.1.0"
-  },
-  "devDependencies": {
-    "tailwindcss": "^4.1.11"
-  }
-}
