@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.sync.get(['geminiApiKey'], (result) => {
         if (result.geminiApiKey) {
             document.getElementById('api-key').value = result.geminiApiKey;
+            console.log(result.geminiApiKey);
         }
     });
 
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const apiKey = document.getElementById('api-key');
         if (!apiKey) return alert('Please enter a valid Gemini API key.');
 
-        chrome.storage.sync.set({ geminiApiKey: apiKey }, () => {
+        chrome.storage.sync.set({ geminiApiKey: apiKey.value }, () => {
             const msg = document.getElementById('success-message');
             msg.style.display = 'block';
             setTimeout(() => msg.style.display = 'none', 3000);

@@ -35,28 +35,41 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-// function sendMessage(msg) {
-//     // Step 1: Find message box
-//     const boxes = document.querySelectorAll('div[contenteditable="true"]');
-//     if (boxes.length === 0) return console.error("❌ Input box not found!");
-//     const inputBox = boxes[boxes.length - 1];
-//     inputBox.focus();
+function sendMessage(msg) {
+    // Step 1: Find message box
+    const boxes = document.querySelectorAll('div[contenteditable="true"]');
+    if (boxes.length === 0) return console.error("❌ Input box not found!");
+    const inputBox = boxes[boxes.length - 1];
+    inputBox.focus();
 
-//     // Step 2: Type message
-//     document.execCommand('insertText', false, msg);
+    // Step 2: Type message
+    document.execCommand('insertText', false, msg);
 
-//     // Step 3: Find send button and click
-//     setTimeout(() => {
-//         const sendButton =
-//             document.querySelector('span[data-icon="wds-ic-send-filled"]') ||
-//             document.querySelector('button span[data-icon="wds-ic-send-filled"]');
+    // Step 3: Find send button and click
+    setTimeout(() => {
+        const sendButton =
+            document.querySelector('span[data-icon="wds-ic-send-filled"]') ||
+            document.querySelector('button span[data-icon="wds-ic-send-filled"]');
 
-//         if (sendButton) {
-//             sendButton.closest('button');
-//             sendButton.click();
-//             console.log("✅ Message sent:", msg);
-//         } else {
-//             console.error("❌ Send button not found! (selector outdated)");
-//         }
-//     }, 500);
-// }
+        if (sendButton) {
+            sendButton.closest('button');
+            sendButton.click();
+            console.log("✅ Message sent:", msg);
+        } else {
+            console.error("❌ Send button not found! (selector outdated)");
+        }
+    }, 500);
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "invokeSendMessage") {
+        const text = message.payload; // expecting a string
+        sendMessage(text);
+        sendResponse({ status: "Message sent from content script." });
+        console.log("Content script: sent message", text);
+        // Optionally send some acknowledgement
+        // sendResponse({ status: "sent" });
+    }
+    // If you want to use sendResponse asynchronously, return true
+    return true;
+});

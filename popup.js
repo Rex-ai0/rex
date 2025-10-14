@@ -18,12 +18,12 @@ document.getElementById('stert').addEventListener('click', async() => {
         chrome.tabs.sendMessage(tab.id, { type: 'GET_REPLY' }, async(response) => {
             if (!response) {
                 result.textContent = 'No response from content script.';
-
             }
             try {
                 const geminiResponse = await getGeminiResponse(response.text, geminiApiKey);
                 console.log('Gemini response:', geminiResponse);
-                result.textContent = geminiResponse;
+
+                result.innerHTML = geminiResponse;
             } catch (error) {
                 console.error('Error getting Gemini response:', error);
                 result.textContent = 'Error: ' + error.message;
@@ -36,43 +36,71 @@ document.getElementById('stert').addEventListener('click', async() => {
 
 
 async function getGeminiResponse(chatText, apiKey) {
-    const max = 1000;
-    const f_response = chatText.length > max ? chatText.slice(0, max) : chatText;
+    const f_response = chatText;
 
     const payload = {
 
-        prompt: { text: f_response },
+        contents: [{
+            parts: [{
+                text: `you are my assistent and help me to replay my chate based on the context provided. if the context is not sufficient, reply with 'hnn'. this is my chate =  \n\n ${f_response} \n and  you want to replay exactly like humen`
+            }]
+        }],
         generationConfig: {
             temperature: 0.2,
             maxOutputTokens: 512
         }
     };
+    console.log('Payload for Gemini API:', payload.contents[0].parts[0].text);
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: {
+                    role: 'user',
+                    parts: [{ text: payload.contents[0].parts[0].text }]
+                },
+                generation_config: {
+                    response_mime_type: 'text/plain'
+                }
+            }),
+        });
 
-    const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-    });
+        if (!res.ok) {
+            const errText = await res.text();
+            console.error('Gemini API error:', res.status, errText);
+            throw new Error(`Network response was not ok: ${res.status}`);
+        }
+        const data = await res.json();
+        const replay = data.candidates[0].content.parts[0].text;
+        console.log('Gemini API response data:', replay);
 
-    if (!res.ok) {
-        const errText = await res.text();
-        console.error('Gemini API error:', res.status, errText);
-        throw new Error(`Network response was not ok: ${res.status}`);
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const activeTab = tabs[0];
+            if (!activeTab) {
+                console.error("No active tab");
+                return;
+            }
+            chrome.tabs.sendMessage(
+                activeTab.id, {
+                    action: "invokeSendMessage",
+                    payload: replay.value //data.candidates[0].output 
+                },
+                (response) => {
+                    console.log("Response from content script:", response);
+                }
+            );
+        })
+    } catch (error) {
+        console.error('Fetch error:', error);
+        result.textContent = 'Error: ' + error.message;
     }
-
-    const data = await res.json();
-    if (!data.candidates || data.candidates.length === 0) {
-        throw new Error('No candidates in response');
-    }
-
-    return data.candidates[0].output;
+    // return data.candidates[0].output;
 }
-
-
 
 
 
@@ -106,7 +134,6 @@ async function getGeminiResponse(chatText, apiKey) {
 // });
 // });
 // });
-
 
 
 document.getElementById('stop').addEventListener('click', function() {
